@@ -1,11 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Ropa+Sans:ital@0;1&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap");
+@import url("https://db.onlinewebfonts.com/c/0a6ee448d1bd65c56f6cf256a7c6f20a?family=Bahnschrift");
+@import url("https://fonts.googleapis.com/css2?family=Heebo&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Oxygen+Mono&display=swap");
 
 h1,
 h2,
 h3 {
-    font-family: Bahnschrift, "Ropa Sans", sans-serif;
+    font-family: Bahnschrift, sans-serif;
     text-shadow: 1px 1px 2px darkslategray;
     font-weight: normal;
 }
@@ -17,7 +17,7 @@ h5 {
 .remark-slide-content {
     background: url("../images/noisy.png");
     background-color: white;
-    font-family: "Segoe UI", Roboto, sans-serif;
+    font-family: Heebo, sans-serif;
     font-size: 34px;
     color: #333333;
     border-left: 1em solid darkslategray;
@@ -26,12 +26,12 @@ h5 {
 
 .remark-code,
 .remark-inline-code {
-    font-family: Consolas, "Oxygen Mono", monospace;
+    font-family: "Oxygen Mono", monospace;
     font-size: 26px;
 }
 
 .remark-slide-number {
-    font-family: Bahnschrift, "Ropa Sans", sans-serif;
+    font-family: Bahnschrift, sans-serif;
     font-size: 20px;
 }
 
@@ -70,7 +70,7 @@ h5 {
 }
 
 .box {
-    font-family: Bahnschrift, "Ropa Sans", sans-serif;
+    font-family: Bahnschrift, sans-serif;
     margin: 0.5em 0;
     padding: 0.5em;
     padding-left: 1em;
@@ -85,7 +85,7 @@ h5 {
 }
 
 .warning {
-    font-family: Bahnschrift, "Ropa Sans", sans-serif;
+    font-family: Bahnschrift, sans-serif;
     margin: 0.5em 0;
     padding: 0.5em;
     padding-left: 1em;
@@ -124,7 +124,7 @@ h5 {
 }
 
 .high {
-    font-family: Bahnschrift, "Ropa Sans", sans-serif;
+    font-family: Bahnschrift, sans-serif;
     font-size: 1.2em;
 }
 
@@ -164,14 +164,6 @@ a:focus {
 
 li > p {
     margin: 0;
-}
-
-blockquote {
-    font-family: Georgia, "Times New Roman", Times, serif;
-    font-style: italic;
-    color: steelblue;
-    padding-left: 1em;
-    border-left: 5px solid steelblue;
 }
 
 .remark-notes {
