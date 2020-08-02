@@ -30,6 +30,11 @@ h5 {
     font-size: 26px;
 }
 
+.remark-slide-number {
+    font-family: Bahnschrift, "Ropa Sans", sans-serif;
+    font-size: 20px;
+}
+
 .left-column {
     width: 49%;
     float: left;
