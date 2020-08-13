@@ -1,11 +1,9 @@
-@import url("https://db.onlinewebfonts.com/c/0a6ee448d1bd65c56f6cf256a7c6f20a?family=Bahnschrift");
-@import url("https://fonts.googleapis.com/css2?family=Heebo&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Oxygen+Mono&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Exo+2&family=Open+Sans&family=Roboto+Mono&display=swap");
 
 h1,
 h2,
 h3 {
-    font-family: Bahnschrift, sans-serif;
+    font-family: Bahnschrift, "Exo 2", sans-serif;
     text-shadow: 1px 1px 2px darkslategray;
     font-weight: normal;
 }
@@ -14,10 +12,14 @@ h5 {
     margin-bottom: 0.5em;
 }
 
+hr {
+    border: 1px solid darkslategray;
+}
+
 .remark-slide-content {
     background: url("../images/noisy.png");
     background-color: white;
-    font-family: Heebo, sans-serif;
+    font-family: "Segoe UI", "Open Sans", sans-serif;
     font-size: 34px;
     color: #333333;
     border-left: 1em solid darkslategray;
@@ -26,12 +28,12 @@ h5 {
 
 .remark-code,
 .remark-inline-code {
-    font-family: "Oxygen Mono", monospace;
+    font-family: Consolas, "Roboto Mono", monospace;
     font-size: 26px;
 }
 
 .remark-slide-number {
-    font-family: Bahnschrift, sans-serif;
+    font-family: Bahnschrift, "Exo 2", sans-serif;
     font-size: 20px;
 }
 
@@ -70,7 +72,7 @@ h5 {
 }
 
 .box {
-    font-family: Bahnschrift, sans-serif;
+    font-family: Bahnschrift, "Exo 2", sans-serif;
     margin: 0.5em 0;
     padding: 0.5em;
     padding-left: 1em;
@@ -85,7 +87,7 @@ h5 {
 }
 
 .warning {
-    font-family: Bahnschrift, sans-serif;
+    font-family: Bahnschrift, "Exo 2", sans-serif;
     margin: 0.5em 0;
     padding: 0.5em;
     padding-left: 1em;
@@ -124,8 +126,7 @@ h5 {
 }
 
 .high {
-    font-family: Bahnschrift, sans-serif;
-    font-size: 1.2em;
+    font-size: 1.1em;
 }
 
 .red {
@@ -146,6 +147,18 @@ h5 {
 
 .emph {
     text-decoration: underline;
+}
+
+.todo {
+    display: block;
+    background: pink;
+    color: darkred;
+    padding: 0.2em 1em;
+}
+
+.todo:before {
+    content: "TODO: ";
+    font-weight: bold;
 }
 
 table th,
