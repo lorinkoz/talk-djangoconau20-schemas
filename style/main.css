@@ -179,6 +179,10 @@ li > p {
     margin: 0;
 }
 
+blockquote {
+    font-style: italic;
+}
+
 .remark-notes {
     font-size: 20px;
 }
