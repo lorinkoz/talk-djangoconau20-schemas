@@ -8,7 +8,7 @@ class: middle
 layout: false
 class: middle
 
-# How the magic happens
+# Schemas, but why?
 
 ---
 
@@ -25,6 +25,27 @@ layout: true
 ## The active tenant
 
 ---
+
+---
+
+layout: true
+
+## Why schemas?
+
+---
+
+-   Hype
+-   Laziness
+-   Sense of security
+-   Customization of tenants
+-   Backup / restore of tenants
+
+---
+
+layout: false
+class: middle
+
+# How the magic happens
 
 ---
 
@@ -125,7 +146,10 @@ layout: true
 
 ---
 
-.todo[Diagram of free users vs bound users]
+![Diagram of two types of binding between users and schemas](images/diagram-user-binding.png)
+
+---
+
 .todo[Diagram of placement of each type of user]
 
 ---
@@ -230,13 +254,20 @@ We are using the `allow_migrate` of a database router.
 layout: false
 class: middle
 
+![Russian helicopter lifts a small airliner](images/helicopter-lifting-airliner.png)
+
+---
+
+layout: false
+class: middle
+
 # The plot thickens
 
 ---
 
 layout: true
 
-## Fast tenant creation
+## Faster tenant creation
 
 ---
 
@@ -262,15 +293,13 @@ layout: true
 
 ---
 
-.todo[Meme of dashboard]
+![Controls of the Crew Dragon](images/crew-dragon-controls.jpg)
 
 ---
 
 #### Strategy:
 
 .box[Iterate, of course]
-
-.todo[Meme of huge set of drawers]
 
 ---
 
@@ -289,8 +318,11 @@ layout: true
 
 ---
 
-.todo[Same meme of set of drawers]
-.todo[Meme of crazy lady, cat and migrations]
+![Stock image of large set of drawers](images/drawers.png)
+
+---
+
+![Meme of crazy lady and cat about schemas and migrations](images/cat-lady-meme-schemas.png)
 
 ---
 
@@ -331,7 +363,7 @@ layout: true
 layout: false
 class: middle
 
-# The good problems to have
+# Beware of the behemoth
 
 ---
 
@@ -365,6 +397,10 @@ layout: true
 
 ---
 
+![Vessels falling off the end of the sea in a flat Earth](images/sea-end.jpg)
+
+---
+
 #### Logical shards
 
 -   Schemas will be your minimum decomposable unit.
@@ -386,13 +422,13 @@ layout: true
 
 layout: true
 
-## When schemas hit the fan
+## The moment of chaos
 
 ---
 
 What if, after all, schemas were not enough?
 
-.todo[Meme of chaos]
+![Meme of three characters of Star Trek in facepalm position](images/triple-facepalm.png)
 
 ---
 
