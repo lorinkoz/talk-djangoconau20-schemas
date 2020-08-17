@@ -149,6 +149,10 @@ hr {
     text-decoration: underline;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .todo {
     display: block;
     background: pink;

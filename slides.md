@@ -5,18 +5,136 @@ class: middle
 
 ---
 
+layout: true
+
+## Talk outline
+
+.bottom[
+.footnote[.red[This slide is excluded from final deck]]
+]
+
+---
+
+##### Intro (7 minutes)
+
+-   Django in 2020
+-   From multi-tenancy to PostgreSQL schemas
+    -   Multi-tenancy and tenants
+    -   The active tenant
+    -   Database approaches
+    -   PostgreSQL schemas
+    -   Schemas in Django
+-   Why schemas
+
+---
+
+##### Content section 1 (5 minutes)
+
+-   Untangling the schemas
+    -   Arranging schemas
+    -   Where to put users
+    -   Careful with content types
+    -   Moving apps between schemas
+
+---
+
+##### Content section 2 (5 minutes)
+
+-   The plot thickens
+    -   Faster tenant creation
+    -   Cross-tenant aggregations
+    -   Migrating the hundreds
+    -   Zero-downtime deployments
+
+---
+
+##### Content section 3 (5 minutes)
+
+-   Beware of the behemoth
+    -   Tables, tables and more tables
+    -   The moment of sharding
+    -   The moment of chaos
+
+---
+
+##### Outro (3 minutes)
+
+-   Closing remarks
+
+---
+
 layout: false
 class: middle
 
-# Schemas, but why?
+![Meme of Django lifting a hevy weight in 2020](images/django-2020-meme.png)
+
+---
+
+layout: false
+class: middle
+
+# From multi-tenancy to PostgreSQL schemas
 
 ---
 
 layout: true
 
-## Database approaches
+## Multi-tenancy
 
 ---
+
+-   Customer .red[**red**] has a problem.
+-   You develop a solution.
+-   Now, customers .blue[**blue**], .green[**green**] and .yellow[**yellow**] have the same problem.
+
+.left-column-66[.box[🤔 What to do?]]
+.right-column-33[.right[![Screenshot of Townscaper with a tiny red house](images/problem-solved.png)]]
+
+.bottom[
+.footnote[Screenshot of https://store.steampowered.com/app/1291340/Townscaper/]
+]
+
+---
+
+.center[![Screenshot of Townscaper with tiny houses](images/single-tenancy.png)]
+
+.bottom[
+.footnote[Screenshot of https://store.steampowered.com/app/1291340/Townscaper/]
+]
+
+---
+
+.center[![Screenshot of Townscaper with an apartment building](images/multi-tenancy.png)]
+
+.bottom[
+.footnote[Screenshot of https://store.steampowered.com/app/1291340/Townscaper/]
+]
+
+---
+
+.left-column-33[
+.center[![Dropbox logo](images/dropbox-logo.png) Accounts]
+]
+
+.left-column-33[
+.center[![Slack logo](images/slack-logo.png) Workspaces]
+]
+
+.left-column-33[
+.center[![Wordpress logo](images/wordpress-logo.png) Blogs]
+]
+
+.left-column-33[
+.center[![Discord logo](images/discord-logo.png) Servers]
+]
+
+.left-column-33[
+.center[![Shopify logo](images/shopify-logo.png) Stores]
+]
+
+.left-column-33[
+.center[![StackExchange logo](images/stackexchange-logo.png) Sites]
+]
 
 ---
 
@@ -26,26 +144,21 @@ layout: true
 
 ---
 
+.todo[Brief notion of the active tenant]
+
 ---
 
 layout: true
 
-## Why schemas?
+## Database approaches
 
 ---
 
--   Hype
--   Laziness
--   Sense of security
--   Customization of tenants
--   Backup / restore of tenants
+**Isolated:**<br/>Multiple databases, one per tenant
 
----
+**Shared:**<br/>One database, tenant column on entry-level tables
 
-layout: false
-class: middle
-
-# How the magic happens
+**Semi-isolated:**<br/>One database, one schema per tenant (PostgreSQL)
 
 ---
 
@@ -55,7 +168,19 @@ layout: true
 
 ---
 
-![Diagram of semi-isolated tenants](images/diagram-semi-isolated.png)
+.left-column-66[PostgreSQL schemas.ref[1] can isolate tenants within a single database.
+{{content}}]
+.right-column-33[.right[![Diagram of semi-isolated tenants](images/diagram-semi-isolated.png)]]
+
+.bottom[
+.footnote[.ref[1] https://www.postgresql.org/docs/current/ddl-schemas.html]
+]
+
+##### Schemas:
+
+-   Layer between database and tables.
+-   Equivalent to namespaces.
+-   Searchable through the **search path**.
 
 ---
 
@@ -71,6 +196,12 @@ SET search_path = tenant2,shared
 ```
 
 ]
+
+---
+
+layout: true
+
+## Schemas in Django
 
 ---
 
@@ -102,6 +233,36 @@ class SchemasDatabaseRouter:
 ```
 
 .warning[⚠️ The `migrate` command itself requires tweaking]
+
+---
+
+layout: false
+class: middle
+
+# Why schemas?
+
+-   Hype
+-   Laziness
+-   Sense of security
+-   Customization of tenants
+-   Backup / restore of tenants
+
+---
+
+layout: false
+class: middle
+
+> Sensible people will see trouble coming and avoid it,
+> but an unthinking person will walk right into it and regret it later.
+>
+> Proverbs 22:3 GNT
+
+---
+
+layout: false
+class: middle
+
+![Image of rocks in perfect balance](images/rock-balance-on-shore.jpg)
 
 ---
 
@@ -156,7 +317,7 @@ layout: true
 
 .left-column[
 
-#### Free users:
+##### Free users:
 
 -   Require tenant binding via database.
 -   Possibly define the active tenant.
@@ -165,7 +326,7 @@ layout: true
 
 .right-column[
 
-#### Bound users:
+##### Bound users:
 
 -   Require an active tenant.
 
@@ -173,7 +334,7 @@ layout: true
 
 ---
 
-#### Careful with database sessions:
+##### Careful with database sessions:
 
 -   Source of leaking authentication.
 -   Must be equally or more strict than users.
@@ -190,7 +351,7 @@ layout: true
 
 `django.contrib.contenttypes`
 
-#### Helpful for:
+##### Helpful for:
 
 -   Generic relations
 -   Polymorphism.ref[1]
@@ -200,7 +361,7 @@ layout: true
 
 .left-column[
 
-#### Free ctypes:
+##### Free ctypes:
 
 -   Consistent across tenants.
 
@@ -208,7 +369,7 @@ layout: true
 
 .right-column[
 
-#### Bound ctypes:
+##### Bound ctypes:
 
 -   Portable with tenants
 -   Requires clearing the content types cache when setting the active tenant.
@@ -230,7 +391,7 @@ We are using the `allow_migrate` of a database router.
 
 ---
 
-#### Strategy:
+##### Strategy:
 
 -   Unapply migrations of the app.
 -   Change app to schema configuration.
@@ -240,7 +401,7 @@ We are using the `allow_migrate` of a database router.
 
 ---
 
-#### What if there is data?
+##### What if there is data?
 
 -   Search path hides the tables.
 -   Hard to do with migrations.
@@ -271,7 +432,7 @@ layout: true
 
 ---
 
-#### By default:
+##### By default:
 
 -   Schema creation implies running all migrations from zero.
 -   Migrations are not necessarily optimal.
@@ -297,13 +458,13 @@ layout: true
 
 ---
 
-#### Strategy:
+##### Strategy:
 
 .box[Iterate, of course]
 
 ---
 
-#### Careful with IDs:
+##### Careful with IDs:
 
 -   Repeated across tenants
 -   Don't guarantee uniqueness
@@ -326,7 +487,7 @@ layout: true
 
 ---
 
-#### Possible strategies:
+##### Possible strategies:
 
 -   Coordinated
 -   Time-zone clustered
@@ -340,19 +501,16 @@ layout: true
 
 ---
 
-.box[Migrations will take time]
 .box[Make your code resilient]
 
----
-
-#### Culture:
+##### Culture:
 
 -   Embrace multi-phase deployments.
 -   Always make migrations reversible.
 
 ---
 
-#### Strategy:
+##### Strategy:
 
 -   Change code to handle both old and new structure.
 -   Mutate structure.
@@ -373,21 +531,71 @@ layout: true
 
 ---
 
-.box[In theory, theory is enough, but practice shows otherwise]
+There is no practical limit on the number of tables in a given database..ref[1]
 
-.box[The number of tables is not imposed by PostgreSQL]
+.bottom[
+.footnote[.ref[1] https://www.postgresql.org/message-id/53386E0C47E7D41194BB0002B325C997747F2B@NTEX60]
+]
+
+---
+
+In theory, theory is enough, but practice shows otherwise
 
 .warning[There is a practical limit!]
 
 ---
 
-```
-million_tables_factor = tables_per_tenant * number_of_tenants / 10**6
-```
+##### Million tables factor
 
-```
-scary_number_of_tenants = 10**6 / tables_per_tenant
-```
+.center[![Formula of the million tables factor](images/formula-million-tables-factor.png)]
+
+.box[`tables_per_tenant \* number_of_tenants / 10\*\*6`]
+
+---
+
+.right[
+
+|            | 50   | 100  | 500  | 1k   | 5k         | 10k        | 50k         | 100k        |
+| ---------- | ---- | ---- | ---- | ---- | ---------- | ---------- | ----------- | ----------- |
+| .bold[50]  | 0.00 | 0.01 | 0.03 | 0.05 | 0.25       | 0.50       | .red[2.50]  | .red[5.00]  |
+| .bold[100] | 0.01 | 0.01 | 0.05 | 0.10 | 0.50       | .red[1.00] | .red[5.00]  | .red[10.00] |
+| .bold[150] | 0.01 | 0.02 | 0.08 | 0.15 | .red[0.75] | .red[1.50] | .red[7.50]  | .red[15.00] |
+| .bold[200] | 0.01 | 0.02 | 0.10 | 0.20 | .red[1.00] | .red[2.00] | .red[10.00] | .red[20.00] |
+| .bold[250] | 0.01 | 0.03 | 0.13 | 0.25 | .red[1.25] | .red[2.50] | .red[12.50] | .red[25.00] |
+| .bold[300] | 0.02 | 0.03 | 0.15 | 0.30 | .red[1.50] | .red[3.00] | .red[15.00] | .red[30.00] |
+
+]
+
+.bottom[
+.footnote[Columns are number of tenants, rows are number of tables, intersection shows the million tables factor for the given row and column.]
+]
+
+---
+
+.right[
+
+|            | 2k   | 3k         | 4k         | 5k         | 6k         | 7k         | 8k         | 9k         |
+| ---------- | ---- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- |
+| .bold[50]  | 0.10 | 0.15       | 0.20       | 0.25       | 0.30       | 0.35       | 0.40       | 0.45       |
+| .bold[100] | 0.20 | 0.30       | 0.40       | 0.50       | 0.60       | 0.70       | .red[0.80] | .red[0.90] |
+| .bold[150] | 0.30 | 0.45       | 0.60       | .red[0.75] | .red[0.90] | .red[1.05] | .red[1.20] | .red[1.35] |
+| .bold[200] | 0.40 | 0.60       | .red[0.80] | .red[1.00] | .red[1.20] | .red[1.40] | .red[1.60] | .red[1.80] |
+| .bold[250] | 0.50 | .red[0.75] | .red[1.00] | .red[1.25] | .red[1.50] | .red[1.75] | .red[2.00] | .red[2.25] |
+| .bold[300] | 0.60 | .red[0.90] | .red[1.20] | .red[1.50] | .red[1.80] | .red[2.10] | .red[2.40] | .red[2.70] |
+
+]
+
+.bottom[
+.footnote[Columns are number of tenants, rows are number of tables, intersection shows the million tables factor for the given row and column.]
+]
+
+---
+
+##### Scary number of tenants
+
+.center[![Formula of the scary number of tenants](images/formula-scary-number-of-tenants.png)]
+
+.box[`10\*\*6 / tables_per_tenant`]
 
 ---
 
@@ -401,7 +609,7 @@ layout: true
 
 ---
 
-#### Logical shards
+##### Logical shards
 
 -   Schemas will be your minimum decomposable unit.
 -   Assign them logical shards in powers of 2.
@@ -409,7 +617,7 @@ layout: true
 
 ---
 
-#### What to do with shared apps?
+##### What to do with shared apps?
 
 .warning[No cross-database relations allowed.]
 
@@ -429,6 +637,23 @@ layout: true
 What if, after all, schemas were not enough?
 
 ![Meme of three characters of Star Trek in facepalm position](images/triple-facepalm.png)
+
+---
+
+layout: false
+class: middle
+
+# In conclusion
+
+---
+
+## Closing remarks
+
+.todo[Answer the questions]
+
+1. Would you be de-facto wrong?
+2. Should you use schemas in a green field project?
+3. Should you immediately stop using schemas?
 
 ---
 
