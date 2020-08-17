@@ -10,7 +10,7 @@ layout: true
 ## Talk outline
 
 .bottom[
-.footnote[.red[This slide is excluded from final deck]]
+.footnote[.red[This slide will be excluded from final deck]]
 ]
 
 ---
@@ -28,7 +28,7 @@ layout: true
 
 ---
 
-##### Content section 1 (5 minutes)
+##### Content section 1 (6 minutes)
 
 -   Untangling the schemas
     -   Arranging schemas
@@ -48,7 +48,7 @@ layout: true
 
 ---
 
-##### Content section 3 (5 minutes)
+##### Content section 3 (4 minutes)
 
 -   Beware of the behemoth
     -   Tables, tables and more tables
@@ -241,11 +241,11 @@ class: middle
 
 # Why schemas?
 
--   Hype
--   Laziness
--   Sense of security
--   Customization of tenants
--   Backup / restore of tenants
+-   Hype.
+-   Sense of security.
+-   Less burden of queries.
+-   Customization of tenants.
+-   Backup / restore of tenants.
 
 ---
 
@@ -339,7 +339,7 @@ layout: true
 -   Source of leaking authentication.
 -   Must be equally or more strict than users.
 
-.box[Keep them together with the app of users]
+.box[Keep them together with users]
 
 ---
 
@@ -353,9 +353,13 @@ layout: true
 
 ##### Helpful for:
 
--   Generic relations
--   Polymorphism.ref[1]
--   Other unnamed wizardries
+-   Generic relations.
+-   Polymorphism..ref[1]
+-   Other unnamed wizardries.
+
+.bottom[
+.footnote[.ref[1] https://github.com/django-polymorphic/django-polymorphic]
+]
 
 ---
 
@@ -371,7 +375,7 @@ layout: true
 
 ##### Bound ctypes:
 
--   Portable with tenants
+-   Portable with tenants.
 -   Requires clearing the content types cache when setting the active tenant.
 
 ]
@@ -401,7 +405,7 @@ We are using the `allow_migrate` of a database router.
 
 ---
 
-##### What if there is data?
+##### .red[What if there is data?]
 
 -   Search path hides the tables.
 -   Hard to do with migrations.
@@ -450,31 +454,6 @@ layout: true
 
 layout: true
 
-## Cross-tenant aggregations
-
----
-
-![Controls of the Crew Dragon](images/crew-dragon-controls.jpg)
-
----
-
-##### Strategy:
-
-.box[Iterate, of course]
-
----
-
-##### Careful with IDs:
-
--   Repeated across tenants
--   Don't guarantee uniqueness
-
-.box[Use global identifiers in addition to regular IDs]
-
----
-
-layout: true
-
 ## Migrating the hundreds
 
 ---
@@ -489,9 +468,10 @@ layout: true
 
 ##### Possible strategies:
 
+-   Sequential
 -   Coordinated
 -   Time-zone clustered
--   Just-in-time migration
+-   Just-in-time
 
 ---
 
@@ -518,6 +498,31 @@ layout: true
 
 ---
 
+layout: true
+
+## Cross-tenant aggregations
+
+---
+
+![Controls of the Crew Dragon](images/crew-dragon-controls.jpg)
+
+---
+
+##### Strategy:
+
+.box[Iterate, of course]
+
+---
+
+##### Careful with IDs:
+
+-   Repeated across tenants.
+-   Don't guarantee uniqueness.
+
+.box[Use global identifiers in addition to regular IDs]
+
+---
+
 layout: false
 class: middle
 
@@ -539,7 +544,7 @@ There is no practical limit on the number of tables in a given database..ref[1]
 
 ---
 
-In theory, theory is enough, but practice shows otherwise
+In theory, theory is enough, but practice shows otherwise.
 
 .warning[There is a practical limit!]
 
