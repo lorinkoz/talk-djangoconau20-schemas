@@ -19,47 +19,22 @@ layout: true
 
 -   Django in 2020
 -   From multi-tenancy to PostgreSQL schemas
-    -   Multi-tenancy and tenants
-    -   The active tenant
-    -   Database approaches
-    -   PostgreSQL schemas
-    -   Schemas in Django
 -   Why schemas
 
 ---
 
-##### Content section 1 (6 minutes)
+##### Content (15 minutes)
 
--   Untangling the schemas
-    -   Arranging schemas
-    -   Where to put users
-    -   Careful with content types
-    -   Moving apps between schemas
-
----
-
-##### Content section 2 (5 minutes)
-
--   The plot thickens
-    -   Faster tenant creation
-    -   Cross-tenant aggregations
-    -   Migrating the hundreds
-    -   Zero-downtime deployments
-
----
-
-##### Content section 3 (4 minutes)
-
--   Beware of the behemoth
-    -   Tables, tables and more tables
-    -   The moment of sharding
-    -   The moment of chaos
+-   Untangling the schemas (5 minutes)
+-   The plot thickens (5 minutes)
+-   Beware of the behemoth (5 minutes)
 
 ---
 
 ##### Outro (3 minutes)
 
 -   Closing remarks
+-   Related open source projects
 
 ---
 
@@ -280,6 +255,7 @@ layout: true
 ---
 
 .todo[Diagram of effects of placing models in shared vs private schemas]
+.todo[What happens if a model is both private and shared (e.g. django_migrations)]
 
 ---
 
@@ -659,6 +635,31 @@ class: middle
 1. Would you be de-facto wrong?
 2. Should you use schemas in a green field project?
 3. Should you immediately stop using schemas?
+
+---
+
+layout: true
+
+## Available packages
+
+.bottom[
+.footnote[Found at https://djangopackages.org/grids/g/multi-tenancy/]
+]
+
+---
+
+##### Semi-isolated database
+
+-   [bernardopires/django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
+-   [tomturner/django-tenants](https://github.com/tomturner/django-tenants)
+-   [lorinkoz/django-pgschemas](https://github.com/tomturner/django-pgschemas)
+
+---
+
+##### Shared database
+
+-   [citusdata/django-multitenant](https://github.com/citusdata/django-multitenant)
+-   [raphaelm/django-scopes](https://github.com/raphaelm/django-scopes)
 
 ---
 
