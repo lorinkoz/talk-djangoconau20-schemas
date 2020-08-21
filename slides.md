@@ -1,9 +1,44 @@
+class: middle center
+
+![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro1.png)
+
+---
+
+class: middle center
+
+![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro2.png)
+
+---
+
+class: middle center
+
+.left-column[![Image of Quentin Tarantino](images/tarantino.png)]
+
+--
+
+![Joke about OpenAI GPT-3 SaaSaaS](images/saasaas.png)
+
+---
+
+class: middle center
+
+![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro3.png)
+
+---
+
+class: middle center
+
+![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro4.png)
+
+---
+
 name: title
 class: middle
 
 # Of Django, PostgreSQL schemas<br/>and your multi-million dollar idea
 
 <hr/>
+
 ![Logo of PyConline AU](images/pyconlineau.png)
 
 ---
@@ -12,6 +47,8 @@ class: middle
 
 .left-column-66[
 
+##### Lorenzo Peña &middot; `lorinkoz`
+
 -   Proud citizen of Holguín, Cuba.
 -   Django developer for 11 years.
 -   Open source contributor.
@@ -19,14 +56,6 @@ class: middle
 
 ]
 .right-column-33[![Photo of myself](images/lorinkoz.png)]
-
----
-
-## The state of affairs
-
--   Epic 2020
--   GPT-3 and the raise of SaaSaaS
--   Django 3.1
 
 ---
 
@@ -56,8 +85,16 @@ layout: true
 ---
 
 -   Customer .red[**red**] has a problem.
+
+--
+
 -   You develop a solution.
+
+--
+
 -   Now, customers .blue[**blue**], .green[**green**] and .yellow[**yellow**] have the same problem.
+
+--
 
 .left-column-66[.box[🤔 What to do?]]
 .right-column-33[.right[![Screenshot of Townscaper with a tiny red house](images/problem-solved.png)]]
@@ -111,11 +148,11 @@ layout: true
 
 ---
 
-**Isolated:**<br/>Multiple databases, one per tenant
+**Isolated:**<br/>Multiple databases, one per tenant.
 
-**Shared:**<br/>One database, tenant column on entry-level tables
+**Shared:**<br/>One database, tenant column on entry-level tables.
 
-**Semi-isolated:**<br/>One database, one schema per tenant (PostgreSQL)
+**Semi-isolated:**<br/>One database, one schema per tenant (PostgreSQL).
 
 ---
 
@@ -133,6 +170,8 @@ layout: true
 .footnote[.ref[1] https://www.postgresql.org/docs/current/ddl-schemas.html]
 ]
 
+--
+
 ##### Schemas:
 
 -   Layer between database and tables.
@@ -144,6 +183,7 @@ layout: true
 ```sql
 SET search_path = schema_1, schema_0
 SET search_path = schema_2, schema_0
+...
 ```
 
 .center[![Diagram of how schemas work](images/schemas.png)]
@@ -156,10 +196,14 @@ layout: true
 
 ---
 
+--
+
 ##### Established packages
 
 -   [bernardopires/django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
 -   [tomturner/django-tenants](https://github.com/tomturner/django-tenants)
+
+--
 
 ##### My own experimental package
 
@@ -193,6 +237,8 @@ class SchemasDatabaseRouter:
             app_label, model_name, tenant
         )
 ```
+
+--
 
 .warning[⚠️ The `migrate` command itself requires tweaking]
 
@@ -244,18 +290,29 @@ layout: true
 
 ---
 
-.box[All tenants correspond to schemas]
-.box[Not all schemas correspond to tenants]
+--
+
+.box[💡 Not all schemas correspond to tenants]
+
+--
+
+.center[![Diagram of schema sequences](images/diagram-schema-sequences.png)]
 
 ---
+
+`products.models.Product`
 
 .center[![Diagram of private model](images/private-model.png)]
 
 ---
 
+`catalogs.models.ProductClassifier`
+
 .center[![Diagram of shared model](images/shared-model.png)]
 
 ---
+
+Django migrations
 
 .center[![Diagram of hidden model](images/hidden-model.png)]
 
@@ -271,12 +328,32 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 
 ```
 
-.box[Why at the app level and not at the model level?]
+--
+
+.box[🤔 Why at the app level and not at the model level?]
 
 ---
 
-.box[Where to store the tenant catalog?]
-.box[What to do with unique types of tenants?]
+##### What is the Python representation of a tenant?
+
+--
+
+```python
+class Tenant:
+
+    schema_name = "schema_1"
+```
+
+--
+
+```python
+class TenantMixin(models.Model):
+
+    schema_name = models.CharField(...)
+
+    class Meta:
+        abstract = True
+```
 
 ---
 
@@ -285,6 +362,8 @@ layout: true
 ## Where to put users
 
 ---
+
+--
 
 ![Diagram of two types of binding between users and schemas](images/diagram-user-binding.png)
 
@@ -311,10 +390,14 @@ layout: true
 
 ##### Careful with database sessions:
 
+`django.contrib.sessions`
+
 -   Source of leaking authentication.
 -   Must be equally or more strict than users.
 
-.box[Keep them together with users]
+--
+
+.box[🦉 Keep them together with users]
 
 ---
 
@@ -324,9 +407,7 @@ layout: true
 
 ---
 
-.center[![Diagram of content types with unknown placement](images/content-types.png)]
-
----
+--
 
 `django.contrib.contenttypes`
 
@@ -339,6 +420,10 @@ layout: true
 .bottom[
 .footnote[.ref[1] https://github.com/django-polymorphic/django-polymorphic]
 ]
+
+---
+
+.center[![Diagram of content types with unknown placement](images/content-types.png)]
 
 ---
 
@@ -359,10 +444,17 @@ layout: true
 
 ---
 
+--
+
 We are using the `allow_migrate` of a database router.
 
-.warning[Migrations are still recorded as being applied]
-.warning[Moving models between schemas implies applying migrations again]
+--
+
+.box[💡 Migrations are still recorded as being applied]
+
+--
+
+.warning[⚠️ Moving models between schemas implies applying migrations differently]
 
 ---
 
@@ -372,7 +464,9 @@ We are using the `allow_migrate` of a database router.
 -   Change "app to schema" configuration.
 -   Apply migrations of the app.
 
-.box[This is why we operate at the application level]
+--
+
+.box[🦉 This is also why we operate at the application level]
 
 ---
 
@@ -382,7 +476,9 @@ We are using the `allow_migrate` of a database router.
 -   Hard to do with migrations.
 -   Recommended with some form of export / import.
 
-.box[Avoid whenever possible]
+--
+
+.box[💡 Avoid whenever possible]
 
 ---
 
@@ -422,7 +518,9 @@ layout: true
 -   Repeated across tenants.
 -   Don't guarantee uniqueness.
 
-.box[Use global identifiers in addition to regular IDs]
+--
+
+.box[💡 Use global identifiers in addition to local IDs]
 
 ---
 
@@ -431,6 +529,8 @@ layout: true
 ## Faster tenant creation
 
 ---
+
+--
 
 ##### By default:
 
@@ -441,7 +541,9 @@ layout: true
 
 ---
 
-.box[Create an extra schema for cloning]
+.box[💡 Create an extra schema for cloning]
+
+--
 
 -   Keep it up to date with structure.
 -   Keep it up to date with initial data.
@@ -477,7 +579,11 @@ layout: true
 
 ---
 
-.box[Make your code resilient]
+--
+
+.box[🦉 Make your code resilient]
+
+--
 
 ##### Culture:
 
@@ -493,12 +599,9 @@ layout: true
 -   Mutate structure.
 -   Update code for new structure alone.
 
----
+--
 
-layout: false
-class: middle
-
-# Beware of the behemoth
+.box[💪 Work out the multi-phase deployment muscle]
 
 ---
 
@@ -509,31 +612,44 @@ class: middle center
 
 ---
 
+layout: false
+class: middle
+
+# Beware of the behemoth
+
+---
+
 layout: true
 
 ## Tables, tables and more tables
 
 ---
 
-There is no practical limit on the number of tables in a given database..ref[1]
+--
+
+There is no .strike[practical] theoretical limit on the number of tables in a given database..ref[1]
 
 .bottom[
 .footnote[.ref[1] https://www.postgresql.org/message-id/53386E0C47E7D41194BB0002B325C997747F2B@NTEX60]
 ]
 
----
+--
 
-In theory, theory is enough, but practice shows otherwise.
+.red[In theory, theory is enough, but practice shows otherwise.]
 
-.warning[There is a practical limit!]
+--
+
+.warning[⚠️ There is a practical limit!]
 
 ---
 
 ##### Million tables factor
 
+--
+
 .center[![Formula of the million tables factor](images/formula-million-tables-factor.png)]
 
-.box[`tables_per_tenant \* number_of_tenants / 10\*\*6`]
+.box[🐍 `tables_per_tenant \* number_of_tenants / 10\*\*6`]
 
 ---
 
@@ -577,13 +693,26 @@ In theory, theory is enough, but practice shows otherwise.
 
 ##### Scary number of tenants
 
+--
+
 .center[![Formula of the scary number of tenants](images/formula-scary-number-of-tenants.png)]
 
-.box[`10\*\*6 / tables_per_tenant`]
+.box[🐍 `10\*\*6 / tables_per_tenant`]
 
 ---
 
-.box[Schema-related monsters might be smaller than they appear]
+.box[💡 Not a Django-specific problem]
+
+--
+
+.box[🦉 Schema-related behemoths are actually smaller than they appear]
+
+---
+
+layout: false
+class: middle center
+
+![Vessels falling off the end of the sea in a flat Earth](images/sea-end.jpg)
 
 ---
 
@@ -593,26 +722,68 @@ layout: true
 
 ---
 
-.center[![Vessels falling off the end of the sea in a flat Earth](images/sea-end.jpg)]
+--
+
+##### Sharding:
+
+Horizontal partitioning of data.
+
+-   Logical shards
+-   Physical shards
+
+Logical shards map to physical shards.
 
 ---
 
-##### Logical shards
-
--   Schemas will be your minimum decomposable unit.
--   Assign them logical shards in powers of 2.
+-   Schemas will be the minimum decomposable unit.
 -   Physical shards must be routed along with schemas.
+
+--
+
+```python
+class Tenant:
+
+    schema_name = "schema_1"
+    logical_shard = 1
+```
+
+---
+
+```python
+class ShardedSchemasDatabaseRouter:
+
+    def db_for_read(model, ...):
+        ...
+
+    def db_for_write(model, ...):
+        ...
+
+    def allow_migrate(self, db, app_label, model_name, ...):
+        ...
+```
+
+.bottom[
+.footnote[https://github.com/lorinkoz/django-pgschemas/pull/41]
+]
 
 ---
 
 ##### What to do with shared apps?
 
-.warning[No cross-database relations allowed]
+.warning[⚠️ No cross-database relations allowed]
 
--   Sync shared apps across physical shards.
+--
+
+-   Keep shared apps synchronized across physical shards.
 -   Don't have relations with shared apps.
 
-.warning[Extra care with free users]
+--
+
+.warning[⚠️ Extra care with free users]
+
+---
+
+.center[![Meme of flex tape for leaking water related to sharding schemas](images/flex-tape-meme-sharding.png)]
 
 ---
 
@@ -622,7 +793,11 @@ layout: true
 
 ---
 
-.center[What if, after all, schemas were not enough?]
+--
+
+.red[What if, after all, schemas were not enough?]
+
+--
 
 .center[![Meme of three characters of Star Trek in facepalm position](images/triple-facepalm.png)]
 
@@ -643,6 +818,8 @@ layout: true
 class: middle
 
 # In conclusion
+
+---
 
 ---
 
