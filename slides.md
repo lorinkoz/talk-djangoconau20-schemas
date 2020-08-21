@@ -3,45 +3,42 @@ class: middle
 
 # Of Django, PostgreSQL schemas<br/>and your multi-million dollar idea
 
+<hr/>
+![Logo of PyConline AU](images/pyconlineau.png)
+
 ---
 
-layout: true
+## Who am I?
 
-## Talk outline
+.left-column-66[
 
-.bottom[
-.footnote[.red[This slide will be excluded from final deck]]
+-   Proud citizen of Holguín, Cuba.
+-   Django developer for 11 years.
+-   Open source contributor.
+-   Chaser of multi-tenancy beasts.
+
 ]
+.right-column-33[![Photo of myself](images/lorinkoz.png)]
 
 ---
 
-##### Intro (7 minutes)
+## The state of affairs
 
--   Django in 2020
--   From multi-tenancy to PostgreSQL schemas
--   Why schemas
-
----
-
-##### Content (15 minutes)
-
--   Untangling the schemas (5 minutes)
--   The plot thickens (5 minutes)
--   Beware of the behemoth (5 minutes)
+-   Epic 2020
+-   GPT-3 and the raise of SaaSaaS
+-   Django 3.1
 
 ---
 
-##### Outro (3 minutes)
-
--   Closing remarks
--   Related open source projects
-
----
-
-layout: false
 class: middle
 
-![Meme of Django lifting a hevy weight in 2020](images/django-2020-meme.png)
+.center[![Meme of Django lifting a hevy weight in 2020](images/django-2020-meme.png)]
+
+---
+
+class: middle
+
+.center[![Meme of Django lifting a hevy golden weight](images/django-gold-meme.png)]
 
 ---
 
@@ -65,25 +62,13 @@ layout: true
 .left-column-66[.box[🤔 What to do?]]
 .right-column-33[.right[![Screenshot of Townscaper with a tiny red house](images/problem-solved.png)]]
 
-.bottom[
-.footnote[Screenshot of https://store.steampowered.com/app/1291340/Townscaper/]
-]
-
 ---
 
 .center[![Screenshot of Townscaper with tiny houses](images/single-tenancy.png)]
 
-.bottom[
-.footnote[Screenshot of https://store.steampowered.com/app/1291340/Townscaper/]
-]
-
 ---
 
 .center[![Screenshot of Townscaper with an apartment building](images/multi-tenancy.png)]
-
-.bottom[
-.footnote[Screenshot of https://store.steampowered.com/app/1291340/Townscaper/]
-]
 
 ---
 
@@ -113,13 +98,10 @@ layout: true
 
 ---
 
-layout: true
+layout: false
+class: middle center
 
-## The active tenant
-
----
-
-.todo[Brief notion of the active tenant]
+.center[![Image of warehouse from the inside](images/warehouse.jpg)]
 
 ---
 
@@ -159,24 +141,29 @@ layout: true
 
 ---
 
-.left-column[
-![Diagram of how schemas work](images/schemas.png)
-]
-
-.right-column[
-
 ```sql
-SET search_path = tenant1,shared
-SET search_path = tenant2,shared
+SET search_path = schema_1, schema_0
+SET search_path = schema_2, schema_0
 ```
 
-]
+.center[![Diagram of how schemas work](images/schemas.png)]
 
 ---
 
 layout: true
 
 ## Schemas in Django
+
+---
+
+##### Established packages
+
+-   [bernardopires/django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
+-   [tomturner/django-tenants](https://github.com/tomturner/django-tenants)
+
+##### My own experimental package
+
+-   [lorinkoz/django-pgschemas](https://github.com/tomturner/django-pgschemas)
 
 ---
 
@@ -188,8 +175,8 @@ class DatabaseWrapper(postgresql.DatabaseWrapper):
     def _cursor(self, name=None):
         # Over simplified!!!
         cursor = super()._cursor(name=name)
-        tenant = get_current_tenant()
-        schemas = get_schemas_from_tenant(tenant)
+*       tenant = get_current_tenant()
+*       schemas = get_schemas_from_tenant(tenant)
         search_path = ",".join(schemas)
         cursor.execute(f"SET search_path = {search_path}")
         return cursor
@@ -216,11 +203,21 @@ class: middle
 
 # Why schemas?
 
--   Hype.
--   Sense of security.
--   Less burden of queries.
--   Customization of tenants.
--   Backup / restore of tenants.
+--
+
+-   Wait, there were other options?
+-   Sense of security
+-   Less burden of queries
+-   Customization of tenants
+-   Easier backup / restore flow of tenants
+-   Hype
+
+---
+
+layout: false
+class: middle center
+
+![Image of rocks in perfect balance](images/rock-balance-on-shore.jpg)
 
 ---
 
@@ -237,13 +234,6 @@ class: middle
 layout: false
 class: middle
 
-![Image of rocks in perfect balance](images/rock-balance-on-shore.jpg)
-
----
-
-layout: false
-class: middle
-
 # Untangling the schemas
 
 ---
@@ -254,8 +244,20 @@ layout: true
 
 ---
 
-.todo[Diagram of effects of placing models in shared vs private schemas]
-.todo[What happens if a model is both private and shared (e.g. django_migrations)]
+.box[All tenants correspond to schemas]
+.box[Not all schemas correspond to tenants]
+
+---
+
+.center[![Diagram of private model](images/private-model.png)]
+
+---
+
+.center[![Diagram of shared model](images/shared-model.png)]
+
+---
+
+.center[![Diagram of hidden model](images/hidden-model.png)]
 
 ---
 
@@ -274,6 +276,7 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 ---
 
 .box[Where to store the tenant catalog?]
+.box[What to do with unique types of tenants?]
 
 ---
 
@@ -287,26 +290,22 @@ layout: true
 
 ---
 
-.todo[Diagram of placement of each type of user]
+.center[![Diagram of private users](images/private-users.png)]
 
 ---
 
-.left-column[
+.center[![Diagram of shared users](images/shared-users.png)]
+
+---
 
 ##### Free users:
 
 -   Require tenant binding via database.
 -   Possibly define the active tenant.
 
-]
-
-.right-column[
-
 ##### Bound users:
 
 -   Require an active tenant.
-
-]
 
 ---
 
@@ -321,7 +320,11 @@ layout: true
 
 layout: true
 
-## Careful with content types
+## Where to put content types
+
+---
+
+.center[![Diagram of content types with unknown placement](images/content-types.png)]
 
 ---
 
@@ -339,22 +342,14 @@ layout: true
 
 ---
 
-.left-column[
-
-##### Free ctypes:
+##### Free content types:
 
 -   Consistent across tenants.
 
-]
-
-.right-column[
-
-##### Bound ctypes:
+##### Bound content types:
 
 -   Portable with tenants.
--   Requires clearing the content types cache when setting the active tenant.
-
-]
+-   Requires clearing the content types cache when changing the active tenant.
 
 ---
 
@@ -374,7 +369,7 @@ We are using the `allow_migrate` of a database router.
 ##### Strategy:
 
 -   Unapply migrations of the app.
--   Change app to schema configuration.
+-   Change "app to schema" configuration.
 -   Apply migrations of the app.
 
 .box[This is why we operate at the application level]
@@ -388,12 +383,11 @@ We are using the `allow_migrate` of a database router.
 -   Recommended with some form of export / import.
 
 .box[Avoid whenever possible]
-.box[Carefully design your data layer]
 
 ---
 
 layout: false
-class: middle
+class: middle center
 
 ![Russian helicopter lifts a small airliner](images/helicopter-lifting-airliner.png)
 
@@ -403,6 +397,32 @@ layout: false
 class: middle
 
 # The plot thickens
+
+---
+
+layout: true
+
+## Cross-tenant aggregations
+
+---
+
+.center[![Analog dashboard](images/dashboard.jpg)]
+
+---
+
+##### Strategy:
+
+-   Iterate through tenants.
+-   Background job with cached results.
+
+---
+
+##### Careful with IDs:
+
+-   Repeated across tenants.
+-   Don't guarantee uniqueness.
+
+.box[Use global identifiers in addition to regular IDs]
 
 ---
 
@@ -421,7 +441,7 @@ layout: true
 
 ---
 
-.box[An extra schema for cloning]
+.box[Create an extra schema for cloning]
 
 -   Keep it up to date with structure.
 -   Keep it up to date with initial data.
@@ -434,11 +454,11 @@ layout: true
 
 ---
 
-![Stock image of large set of drawers](images/drawers.png)
+.center[![Stock image of large set of drawers](images/drawers.png)]
 
 ---
 
-![Meme of crazy lady and cat about schemas and migrations](images/cat-lady-meme-schemas.png)
+.center[![Meme of crazy lady and cat about schemas and migrations](images/cat-lady-meme-schemas.png)]
 
 ---
 
@@ -463,6 +483,7 @@ layout: true
 
 -   Embrace multi-phase deployments.
 -   Always make migrations reversible.
+-   Be prepared to reverse migrations.
 
 ---
 
@@ -474,35 +495,17 @@ layout: true
 
 ---
 
-layout: true
-
-## Cross-tenant aggregations
-
----
-
-![Controls of the Crew Dragon](images/crew-dragon-controls.jpg)
-
----
-
-##### Strategy:
-
-.box[Iterate, of course]
-
----
-
-##### Careful with IDs:
-
--   Repeated across tenants.
--   Don't guarantee uniqueness.
-
-.box[Use global identifiers in addition to regular IDs]
-
----
-
 layout: false
 class: middle
 
 # Beware of the behemoth
+
+---
+
+layout: false
+class: middle center
+
+.center[![Meme of girl in the water hose](images/meme-water-hose.jpg)]
 
 ---
 
@@ -580,13 +583,17 @@ In theory, theory is enough, but practice shows otherwise.
 
 ---
 
+.box[Schema-related monsters might be smaller than they appear]
+
+---
+
 layout: true
 
 ## The moment of sharding
 
 ---
 
-![Vessels falling off the end of the sea in a flat Earth](images/sea-end.jpg)
+.center[![Vessels falling off the end of the sea in a flat Earth](images/sea-end.jpg)]
 
 ---
 
@@ -600,7 +607,7 @@ layout: true
 
 ##### What to do with shared apps?
 
-.warning[No cross-database relations allowed.]
+.warning[No cross-database relations allowed]
 
 -   Sync shared apps across physical shards.
 -   Don't have relations with shared apps.
@@ -611,55 +618,66 @@ layout: true
 
 layout: true
 
-## The moment of chaos
+## The moment of .red[chaos]
 
 ---
 
-What if, after all, schemas were not enough?
+.center[What if, after all, schemas were not enough?]
 
-![Meme of three characters of Star Trek in facepalm position](images/triple-facepalm.png)
+.center[![Meme of three characters of Star Trek in facepalm position](images/triple-facepalm.png)]
 
 ---
 
-layout: false
+##### Some say:
+
+> When you find out schemas are not enough, you should have enough money to afford a rewrite.
+
+##### But remember:
+
+> Sensible people will see trouble coming and avoid it,
+> but an unthinking person will walk right into it and regret it later.
+
+---
+
+layout: true
 class: middle
 
 # In conclusion
 
 ---
 
-## Closing remarks
-
-.todo[Answer the questions]
-
-1. Would you be de-facto wrong?
-2. Should you use schemas in a green field project?
-3. Should you immediately stop using schemas?
+1. Is multi-tenancy through schemas de-facto wrong?
+2. Should you use schemas in your next SaaS project?
+3. Should you change your database architecture now?
 
 ---
 
-layout: true
+layout: false
 
-## Available packages
-
-.bottom[
-.footnote[Found at https://djangopackages.org/grids/g/multi-tenancy/]
-]
-
----
-
-##### Semi-isolated database
-
--   [bernardopires/django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
--   [tomturner/django-tenants](https://github.com/tomturner/django-tenants)
--   [lorinkoz/django-pgschemas](https://github.com/tomturner/django-pgschemas)
-
----
+## Alternative packages
 
 ##### Shared database
 
 -   [citusdata/django-multitenant](https://github.com/citusdata/django-multitenant)
 -   [raphaelm/django-scopes](https://github.com/raphaelm/django-scopes)
+
+---
+
+layout: false
+
+## And that's it!
+
+##### We can keep in touch here:
+
+|         |                                                    |
+| ------- | -------------------------------------------------- |
+| Twitter | [@lorinkoz](https://twitter.com/lorinkoz)          |
+| GitHub  | [github.com/lorinkoz](https://github.com/lorinkoz) |
+| Email   | [lorinkoz@gmail.com](mailto:lorinkoz@gmail.com)    |
+
+##### Special thanks to:
+
+Katie McLaughlin
 
 ---
 
