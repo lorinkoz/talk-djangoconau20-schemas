@@ -2,17 +2,39 @@ class: middle center
 
 ![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro1.png)
 
+???
+
+“What’s wrong with my multi-tenancy approach”, was the question in this Reddit post I found some weeks ago...
+
 ---
 
 class: middle center
 
 ![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro2.png)
 
+???
+
+...from a person that was intending to create a multi-million-dollar app in Django by means of adding multi-tenancy to a previously existing single-tenant project.
+
+---
+
+class: middle center
+
+![Meme of clapping the hand of someone who's drowning regarding an online question](images/hand-clap-drowning-meme.png)
+
+???
+
+I felt quite identified with the redditer, since I myself had the same question a couple of years ago. And, despite the fact that I took a different approach than this person, it’s true that there’s more than this mate and me out in the ocean wondering what is wrong with the path they have taken, or are about take, when it comes to multi-tenancy in Django.
+
 ---
 
 class: middle center
 
 .left-column[![Image of Quentin Tarantino](images/tarantino.png)]
+
+???
+
+Today the world has changed a bit. Things are not the same since Tarantino was awarded with best production design for the year 2020, and before OpenAI introduced the SaaSaaS platform for software-as-a-service-as-a-service.
 
 --
 
@@ -24,11 +46,9 @@ class: middle center
 
 ![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro3.png)
 
----
+???
 
-class: middle center
-
-![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro4.png)
+But anyways, I now feel in a much better position to answer this mate and myself of what was wrong then and what could still be wrong today.
 
 ---
 
@@ -40,6 +60,10 @@ class: middle
 <hr/>
 
 ![Logo of PyConline AU](images/pyconlineau.png)
+
+???
+
+So, if you’ve ever woken up with a multi-million-dollar idea for a multi-tenancy project in Django, and you’ve made the decision to do so through PostgreSQL schemas, this talk is definitely for you.
 
 ---
 
@@ -83,6 +107,8 @@ layout: true
 ## Multi-tenancy
 
 ---
+
+--
 
 -   Customer .red[**red**] has a problem.
 
@@ -150,9 +176,9 @@ layout: true
 
 **Isolated:**<br/>Multiple databases, one per tenant.
 
-**Shared:**<br/>One database, tenant column on entry-level tables.
+**Shared:**<br/>One database, tables scoped by tenant.
 
-**Semi-isolated:**<br/>One database, one schema per tenant (PostgreSQL).
+**Semi-isolated:**<br/>One database, one PostgreSQL schema per tenant.
 
 ---
 
@@ -162,8 +188,15 @@ layout: true
 
 ---
 
-.left-column-66[PostgreSQL schemas.ref[1] can isolate tenants within a single database.
-{{content}}]
+.left-column-66[
+
+##### Schemas:.ref[1]
+
+-   Layer between database and tables.
+-   Equivalent to namespaces.
+-   In the face of ambiguity, precedence is set through the **search path**.
+
+]
 .right-column-33[.right[![Diagram of semi-isolated tenants](images/diagram-semi-isolated.png)]]
 
 .bottom[
@@ -172,17 +205,15 @@ layout: true
 
 --
 
-##### Schemas:
-
--   Layer between database and tables.
--   Equivalent to namespaces.
--   Searchable through the **search path**.
+```sql
+SET search_path = schema_a,schema_b,public
+```
 
 ---
 
 ```sql
-SET search_path = schema_1, schema_0
-SET search_path = schema_2, schema_0
+SET search_path = schema_1,public
+SET search_path = schema_2,public
 ...
 ```
 
@@ -219,8 +250,8 @@ class DatabaseWrapper(postgresql.DatabaseWrapper):
     def _cursor(self, name=None):
         # Over simplified!!!
         cursor = super()._cursor(name=name)
-*       tenant = get_current_tenant()
-*       schemas = get_schemas_from_tenant(tenant)
+        tenant = `get_current_tenant`()
+        schemas = `get_schemas_from_tenant`(tenant)
         search_path = ",".join(schemas)
         cursor.execute(f"SET search_path = {search_path}")
         return cursor
@@ -232,7 +263,7 @@ class DatabaseWrapper(postgresql.DatabaseWrapper):
 class SchemasDatabaseRouter:
 
     def allow_migrate(self, db, app_label, model_name, ...):
-        tenant = get_current_tenant()
+        tenant = `get_current_tenant`()
         return `model_belongs_to_tenant`(
             app_label, model_name, tenant
         )
@@ -270,51 +301,46 @@ class: middle center
 layout: false
 class: middle
 
-> Sensible people will see trouble coming and avoid it,
-> but an unthinking person will walk right into it and regret it later.
->
-> Proverbs 22:3 GNT
-
----
-
-layout: false
-class: middle
-
 # Untangling the schemas
 
 ---
 
 layout: true
 
-## Arranging schemas
+## Tenants, schemas and models
 
 ---
 
 --
 
-.box[💡 Not all schemas correspond to tenants]
+##### What is the Python representation of a tenant?
 
 --
+
+```python
+# abstract_concept.py
+tenant = Tenant(schema_name="schema_1")
+```
+
+--
+
+```python
+# models.py
+class Tenant(models.Model):
+    schema_name = models.CharField(unique=True, ...)
+```
+
+---
+
+.box[💡 All tenants have an associated schema]
+
+--
+
+.box[🤚 Not all schemas have a corresponding tenant]
+
+---
 
 .center[![Diagram of schema sequences](images/diagram-schema-sequences.png)]
-
----
-
-`products.models.Product`
-
-.center[![Diagram of private model](images/private-model.png)]
-
----
-
-`catalogs.models.ProductClassifier`
-
-.center[![Diagram of shared model](images/shared-model.png)]
-
----
-
-Django migrations
-
-.center[![Diagram of hidden model](images/hidden-model.png)]
 
 ---
 
@@ -334,26 +360,21 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 
 ---
 
-##### What is the Python representation of a tenant?
+.left[`products.models.Product`]
 
---
+.center[![Diagram of private model](images/private-model.png)]
 
-```python
-class Tenant:
+---
 
-    schema_name = "schema_1"
-```
+.right[`catalogs.models.ProductClassifier`]
 
---
+.center[![Diagram of shared model](images/shared-model.png)]
 
-```python
-class TenantMixin(models.Model):
+---
 
-    schema_name = models.CharField(...)
+.center[Django migrations]
 
-    class Meta:
-        abstract = True
-```
+.center[![Diagram of hidden model](images/hidden-model.png)]
 
 ---
 
@@ -366,6 +387,11 @@ layout: true
 --
 
 ![Diagram of two types of binding between users and schemas](images/diagram-user-binding.png)
+
+--
+
+.left-column[.center[![Slack logo](images/slack-logo.png)]]
+.right-column[.center[![Discord logo](images/discord-logo.png)]]
 
 ---
 
@@ -464,16 +490,12 @@ We are using the `allow_migrate` of a database router.
 -   Change "app to schema" configuration.
 -   Apply migrations of the app.
 
---
-
-.box[🦉 This is also why we operate at the application level]
-
 ---
 
 ##### .red[What if there is data?]
 
--   Search path hides the tables.
 -   Hard to do with migrations.
+-   Search path hides the tables.
 -   Recommended with some form of export / import.
 
 --
@@ -538,6 +560,12 @@ layout: true
 -   Migrations are not necessarily optimal.
 -   Migrations can take time.
 -   Additional data initialization can take time.
+
+--
+
+##### Possible strategy:
+
+-   Pre-provision schemas.
 
 ---
 
@@ -705,7 +733,7 @@ There is no .strike[practical] theoretical limit on the number of tables in a gi
 
 --
 
-.box[🦉 Schema-related behemoths are actually smaller than they appear]
+.box[🦉 Schema-related behemoths are not that massive]
 
 ---
 
@@ -741,10 +769,10 @@ Logical shards map to physical shards.
 --
 
 ```python
-class Tenant:
+tenant = Tenant(schema_name="schema_1", logical_shard=1)
 
-    schema_name = "schema_1"
-    logical_shard = 1
+database = get_physical_shard_from_tenant(tenant)
+
 ```
 
 ---
@@ -775,7 +803,7 @@ class ShardedSchemasDatabaseRouter:
 --
 
 -   Keep shared apps synchronized across physical shards.
--   Don't have relations with shared apps.
+-   Let go referential integrity between private and shared apps.
 
 --
 
@@ -811,6 +839,7 @@ layout: true
 
 > Sensible people will see trouble coming and avoid it,
 > but an unthinking person will walk right into it and regret it later.
+> .right[Proverbs 22:3 GNT]
 
 ---
 
