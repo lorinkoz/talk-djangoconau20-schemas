@@ -353,9 +353,9 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 .left-column[![Diagram of shared model](images/shared-model.png)]
 .right-column[
 
+-   The tenant catalog
 -   Immutable catalogs
 -   Cached aggregations
--   Content-types (in general)
 -   High volume writes
     ]
 
@@ -367,6 +367,7 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 .right-column[
 
 -   Django migrations
+-   Content-types (in general)
 -   Other meta models
     ]
 
@@ -438,7 +439,7 @@ We are using the `allow_migrate` of a database router.
 
 --
 
-.warning[⚠️ Migrations must be unapplied and applied again]
+.warning[⚠️ Migrations must be reapplied differently]
 
 ---
 
@@ -548,9 +549,9 @@ layout: true
 
 ##### Strategy:
 
--   Change code to handle both old and new structure.
--   Mutate structure.
--   Update code for new structure alone.
+-   Change code to handle both old and new DB structure.
+-   Mutate DB structure.
+-   Update code for new DB structure alone.
 
 --
 
@@ -741,11 +742,6 @@ class ShardedSchemasDatabaseRouter:
 ##### What to do with .emph[shared] apps?
 
 .warning[⚠️ No cross-database relations allowed]
-
---
-
--   Keep shared apps synchronized across physical shards.
--   Let go referential integrity between private and shared apps.
 
 --
 
