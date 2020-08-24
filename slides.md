@@ -63,7 +63,7 @@ So, if you’ve ever woken up with a multi-million-dollar idea for a multi-tenan
 
 .left-column-66[
 
-##### Lorenzo Peña &middot; `lorinkoz`
+##### Lorenzo Peña
 
 -   Proud citizen of Holguín, Cuba.
 -   Django developer for 11 years.
@@ -90,7 +90,7 @@ class: middle
 layout: false
 class: middle
 
-# From multi-tenancy to PostgreSQL schemas
+# From multi-tenancy to<br/>PostgreSQL schemas in Django
 
 ---
 
@@ -128,11 +128,11 @@ layout: true
 ---
 
 .left-column-33[
-.center[![Dropbox logo](images/dropbox-logo.png) Accounts]
+.center[![Slack logo](images/slack-logo.png) Workspaces]
 ]
 
 .left-column-33[
-.center[![Slack logo](images/slack-logo.png) Workspaces]
+.center[![Dropbox logo](images/dropbox-logo.png) Accounts]
 ]
 
 .left-column-33[
@@ -354,7 +354,8 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 .right-column[
 
 -   The tenant catalog
--   Immutable catalogs
+-   Read-only catalogs
+-   System-wide data
 -   Cached aggregations
 -   High volume writes
     ]
@@ -367,9 +368,13 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 .right-column[
 
 -   Django migrations
--   Content-types (in general)
+-   Content-types.ref[1]
 -   Other meta models
     ]
+
+.bottom[
+.footnote[.ref[1] With known side effects]
+]
 
 ---
 
@@ -415,7 +420,7 @@ Require database binding with tenants
 `django.contrib.sessions`
 
 -   Source of leaking authentication.
--   Must be equally strict or more strict than users.
+-   Must be equally strict or stricter than users.
 
 --
 
@@ -447,13 +452,13 @@ We are using the `allow_migrate` of a database router.
 
 -   Unapply migrations of the app.
 -   Change "app to schema" configuration.
--   Apply migrations of the app.
+-   Apply migrations of the app again.
 
 ---
 
 ##### .red[What if there is data?]
 
--   Hard to do with migrations.
+-   Hard to fix with migrations.
 -   Search path hides the tables.
 -   Recommended with some form of export / import.
 
@@ -488,8 +493,7 @@ layout: true
 ##### Why?
 
 -   Schema creation implies running all migrations from zero.
--   Migrations are not necessarily optimal.
--   Migrations can take time.
+-   Migration history is not necessarily optimal.
 -   Additional data initialization can take time.
 
 --
@@ -575,12 +579,9 @@ layout: true
 -   Iterate through tenants.
 -   Background job with cached results.
 
----
+--
 
 ##### .red[Careful with IDs!]
-
--   Repeated across tenants.
--   Don't guarantee uniqueness.
 
 --
 
@@ -798,7 +799,7 @@ class: middle
 
 ---
 
-## Is multi-tenancy through schemas de-facto wrong?
+## Is multi-tenancy through schemas de-facto wrong as a choice?
 
 <br/>
 
@@ -814,25 +815,25 @@ class: middle
 
 --
 
+# .green[Why schemas over shared?]
+
+--
+
 # .green[Run the numbers]
 
 ---
 
-## Should you change your database architecture right away?
+## Should you change your database architecture to something other than schemas?
 
 <br/>
 
 --
 
-# .green[It depends]
+# .green[Would you have used a different architecture should your project have started today?]
 
 --
 
-### .green[Run the numbers - don't panic]
-
---
-
-### .green[There are ways to smartly transition]
+### .green[Don't panic - There are ways to smartly transition]
 
 ---
 
