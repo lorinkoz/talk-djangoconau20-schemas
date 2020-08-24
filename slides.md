@@ -1,5 +1,11 @@
 class: middle center
 
+### Yes, this is the first slide
+
+---
+
+class: middle center
+
 ![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro1.png)
 
 ???
@@ -25,20 +31,6 @@ class: middle center
 ???
 
 I felt quite identified with the redditer, since I myself had the same question a couple of years ago. And, despite the fact that I took a different approach than this person, it’s true that there’s more than this mate and me out in the ocean wondering what is wrong with the path they have taken, or are about take, when it comes to multi-tenancy in Django.
-
----
-
-class: middle center
-
-.left-column[![Image of Quentin Tarantino](images/tarantino.png)]
-
-???
-
-Today the world has changed a bit. Things are not the same since Tarantino was awarded with best production design for the year 2020, and before OpenAI introduced the SaaSaaS platform for software-as-a-service-as-a-service.
-
---
-
-![Joke about OpenAI GPT-3 SaaSaaS](images/saasaas.png)
 
 ---
 
@@ -223,55 +215,40 @@ SET search_path = schema_2,public
 
 layout: true
 
-## Schemas in Django
+## PostgreSQL schemas .green[in Django]
 
 ---
 
 --
 
-##### Established packages
+##### Established packages:
 
 -   [bernardopires/django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
 -   [tomturner/django-tenants](https://github.com/tomturner/django-tenants)
 
 --
 
-##### My own experimental package
+##### My own experimental package:
 
 -   [lorinkoz/django-pgschemas](https://github.com/tomturner/django-pgschemas)
 
 ---
 
-```python
-from django.db.backends.postgresql import base as postgresql
-
-
-class DatabaseWrapper(postgresql.DatabaseWrapper):
-    def _cursor(self, name=None):
-        # Over simplified!!!
-        cursor = super()._cursor(name=name)
-        tenant = `get_current_tenant`()
-        schemas = `get_schemas_from_tenant`(tenant)
-        search_path = ",".join(schemas)
-        cursor.execute(f"SET search_path = {search_path}")
-        return cursor
-```
-
----
-
-```python
-class SchemasDatabaseRouter:
-
-    def allow_migrate(self, db, app_label, model_name, ...):
-        tenant = `get_current_tenant`()
-        return `model_belongs_to_tenant`(
-            app_label, model_name, tenant
-        )
-```
+##### The three cornerstones of the packages:
 
 --
 
-.warning[⚠️ The `migrate` command itself requires tweaking]
+.box[Custom database backend to set the `search_path`]
+
+--
+
+.box[Custom `migrate` command to operate with schemas]
+
+--
+
+.box[Custom database router with `allow_migrate`]
+
+.right[▫️]
 
 ---
 
@@ -338,7 +315,7 @@ class Tenant(models.Model):
 
 .box[🤚 Not all schemas have a corresponding tenant]
 
----
+--
 
 .center[![Diagram of schema sequences](images/diagram-schema-sequences.png)]
 
@@ -360,27 +337,44 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 
 ---
 
-.left[`products.models.Product`]
+##### Tenant (private) models
 
-.center[![Diagram of private model](images/private-model.png)]
+.left-column[![Diagram of private model](images/private-model.png)]
+.right-column[
+
+-   Tenant specific models
+-   Customizable catalogs
+    ]
 
 ---
 
-.right[`catalogs.models.ProductClassifier`]
+##### Shared models
 
-.center[![Diagram of shared model](images/shared-model.png)]
+.left-column[![Diagram of shared model](images/shared-model.png)]
+.right-column[
+
+-   Immutable catalogs
+-   Cached aggregations
+-   Content-types (in general)
+-   High volume writes
+    ]
 
 ---
 
-.center[Django migrations]
+##### Duplicated (hidden) models
 
-.center[![Diagram of hidden model](images/hidden-model.png)]
+.left-column[![Diagram of hidden model](images/hidden-model.png)]
+.right-column[
+
+-   Django migrations
+-   Other meta models
+    ]
 
 ---
 
 layout: true
 
-## Where to put users
+## Where to put users?
 
 ---
 
@@ -395,72 +389,36 @@ layout: true
 
 ---
 
-.center[![Diagram of private users](images/private-users.png)]
+##### Bound users
 
----
-
-.center[![Diagram of shared users](images/shared-users.png)]
-
----
-
-##### Free users:
-
--   Require tenant binding via database.
--   Possibly define the active tenant.
-
-##### Bound users:
-
--   Require an active tenant.
-
----
-
-##### Careful with database sessions:
-
-`django.contrib.sessions`
-
--   Source of leaking authentication.
--   Must be equally or more strict than users.
-
---
-
-.box[🦉 Keep them together with users]
-
----
-
-layout: true
-
-## Where to put content types
-
----
-
---
-
-`django.contrib.contenttypes`
-
-##### Helpful for:
-
--   Generic relations.
--   Polymorphism..ref[1]
--   Other unnamed wizardries.
-
-.bottom[
-.footnote[.ref[1] https://github.com/django-polymorphic/django-polymorphic]
+.right-column-66[![Diagram of private users](images/private-users.png)]
+.left-column-33[![Slack logo](images/slack-logo.png)]
+.left-column-33[
+Require an active tenant
 ]
 
 ---
 
-.center[![Diagram of content types with unknown placement](images/content-types.png)]
+##### Free users
+
+.right-column-66[![Diagram of shared users](images/shared-users.png)]
+.left-column-33[![Discord logo](images/discord-logo.png)]
+.left-column-33[
+Require database binding with tenants
+]
 
 ---
 
-##### Free content types:
+##### .red[Careful with database sessions!]
 
--   Consistent across tenants.
+`django.contrib.sessions`
 
-##### Bound content types:
+-   Source of leaking authentication.
+-   Must be equally strict or more strict than users.
 
--   Portable with tenants.
--   Requires clearing the content types cache when changing the active tenant.
+--
+
+.box[🦉 Keep them together with users]
 
 ---
 
@@ -480,7 +438,7 @@ We are using the `allow_migrate` of a database router.
 
 --
 
-.warning[⚠️ Moving models between schemas implies applying migrations differently]
+.warning[⚠️ Migrations must be unapplied and applied again]
 
 ---
 
@@ -520,41 +478,13 @@ class: middle
 
 layout: true
 
-## Cross-tenant aggregations
-
----
-
-.center[![Analog dashboard](images/dashboard.jpg)]
-
----
-
-##### Strategy:
-
--   Iterate through tenants.
--   Background job with cached results.
-
----
-
-##### Careful with IDs:
-
--   Repeated across tenants.
--   Don't guarantee uniqueness.
-
---
-
-.box[💡 Use global identifiers in addition to local IDs]
-
----
-
-layout: true
-
-## Faster tenant creation
+## Tenant creation is slow
 
 ---
 
 --
 
-##### By default:
+##### Why?
 
 -   Schema creation implies running all migrations from zero.
 -   Migrations are not necessarily optimal.
@@ -563,41 +493,36 @@ layout: true
 
 --
 
-##### Possible strategy:
-
--   Pre-provision schemas.
-
----
-
-.box[💡 Create an extra schema for cloning]
-
---
-
--   Keep it up to date with structure.
--   Keep it up to date with initial data.
+.box[💡 Provision a special schema for cloning]
 
 ---
 
 layout: true
 
-## Migrating the hundreds
+## You know what else is slow?
 
 ---
 
-.center[![Stock image of large set of drawers](images/drawers.png)]
+---
+
+.left[![Meme of crazy lady and cat about schemas and migrations](images/cat-lady-meme-schemas.png)]
 
 ---
 
-.center[![Meme of crazy lady and cat about schemas and migrations](images/cat-lady-meme-schemas.png)]
+.left-column-66[![Stock image of large set of drawers](images/drawers.png)]
 
----
+--
+
+.right-column-33[
 
 ##### Possible strategies:
 
 -   Sequential
--   Coordinated
--   Time-zone clustered
+-   In parallel
+-   By time-zone
 -   Just-in-time
+
+]
 
 ---
 
@@ -630,6 +555,35 @@ layout: true
 --
 
 .box[💪 Work out the multi-phase deployment muscle]
+.center[![Joke about Friday deployments](images/sign-friday-deployments.png)]
+
+---
+
+layout: true
+
+## Cross-tenant aggregations
+
+---
+
+.center[![Analog dashboard](images/dashboard.jpg)]
+
+---
+
+##### Strategy:
+
+-   Iterate through tenants.
+-   Background job with cached results.
+
+---
+
+##### .red[Careful with IDs!]
+
+-   Repeated across tenants.
+-   Don't guarantee uniqueness.
+
+--
+
+.box[💡 Use global identifiers in addition to local IDs]
 
 ---
 
@@ -683,33 +637,14 @@ There is no .strike[practical] theoretical limit on the number of tables in a gi
 
 .right[
 
-|            | 50   | 100  | 500  | 1k   | 5k         | 10k        | 50k         | 100k        |
-| ---------- | ---- | ---- | ---- | ---- | ---------- | ---------- | ----------- | ----------- |
-| .bold[50]  | 0.00 | 0.01 | 0.03 | 0.05 | 0.25       | 0.50       | .red[2.50]  | .red[5.00]  |
-| .bold[100] | 0.01 | 0.01 | 0.05 | 0.10 | 0.50       | .red[1.00] | .red[5.00]  | .red[10.00] |
-| .bold[150] | 0.01 | 0.02 | 0.08 | 0.15 | .red[0.75] | .red[1.50] | .red[7.50]  | .red[15.00] |
-| .bold[200] | 0.01 | 0.02 | 0.10 | 0.20 | .red[1.00] | .red[2.00] | .red[10.00] | .red[20.00] |
-| .bold[250] | 0.01 | 0.03 | 0.13 | 0.25 | .red[1.25] | .red[2.50] | .red[12.50] | .red[25.00] |
-| .bold[300] | 0.02 | 0.03 | 0.15 | 0.30 | .red[1.50] | .red[3.00] | .red[15.00] | .red[30.00] |
-
-]
-
-.bottom[
-.footnote[Columns are number of tenants, rows are number of tables, intersection shows the million tables factor for the given row and column.]
-]
-
----
-
-.right[
-
-|            | 2k   | 3k         | 4k         | 5k         | 6k         | 7k         | 8k         | 9k         |
-| ---------- | ---- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- |
-| .bold[50]  | 0.10 | 0.15       | 0.20       | 0.25       | 0.30       | 0.35       | 0.40       | 0.45       |
-| .bold[100] | 0.20 | 0.30       | 0.40       | 0.50       | 0.60       | 0.70       | .red[0.80] | .red[0.90] |
-| .bold[150] | 0.30 | 0.45       | 0.60       | .red[0.75] | .red[0.90] | .red[1.05] | .red[1.20] | .red[1.35] |
-| .bold[200] | 0.40 | 0.60       | .red[0.80] | .red[1.00] | .red[1.20] | .red[1.40] | .red[1.60] | .red[1.80] |
-| .bold[250] | 0.50 | .red[0.75] | .red[1.00] | .red[1.25] | .red[1.50] | .red[1.75] | .red[2.00] | .red[2.25] |
-| .bold[300] | 0.60 | .red[0.90] | .red[1.20] | .red[1.50] | .red[1.80] | .red[2.10] | .red[2.40] | .red[2.70] |
+|            | 50   | 100  | 500  | 1k   | 5k          | 10k        | 50k         | 100k        |
+| ---------- | ---- | ---- | ---- | ---- | ----------- | ---------- | ----------- | ----------- |
+| .bold[50]  | 0.00 | 0.01 | 0.03 | 0.05 | 0.25        | 0.50       | .red[2.50]  | .red[5.00]  |
+| .bold[100] | 0.01 | 0.01 | 0.05 | 0.10 | 0.50        | .red[1.00] | .red[5.00]  | .red[10.00] |
+| .bold[150] | 0.01 | 0.02 | 0.08 | 0.15 | .emph[0.75] | .red[1.50] | .red[7.50]  | .red[15.00] |
+| .bold[200] | 0.01 | 0.02 | 0.10 | 0.20 | .red[1.00]  | .red[2.00] | .red[10.00] | .red[20.00] |
+| .bold[250] | 0.01 | 0.03 | 0.13 | 0.25 | .red[1.25]  | .red[2.50] | .red[12.50] | .red[25.00] |
+| .bold[300] | 0.02 | 0.03 | 0.15 | 0.30 | .red[1.50]  | .red[3.00] | .red[15.00] | .red[30.00] |
 
 ]
 
@@ -720,8 +655,6 @@ There is no .strike[practical] theoretical limit on the number of tables in a gi
 ---
 
 ##### Scary number of tenants
-
---
 
 .center[![Formula of the scary number of tenants](images/formula-scary-number-of-tenants.png)]
 
@@ -740,13 +673,13 @@ There is no .strike[practical] theoretical limit on the number of tables in a gi
 layout: false
 class: middle center
 
-![Vessels falling off the end of the sea in a flat Earth](images/sea-end.jpg)
+![Joke with vessels falling off the end of the sea](images/uncharted-territories.png)
 
 ---
 
 layout: true
 
-## The moment of sharding
+## What if we shard?
 
 ---
 
@@ -756,12 +689,18 @@ layout: true
 
 Horizontal partitioning of data.
 
--   Logical shards
 -   Physical shards
+-   Logical shards
 
-Logical shards map to physical shards.
+Logical shards are mapped to physical shards.
 
 ---
+
+.box[🤓 Let's try it in the Django side]
+
+--
+
+##### Strategy:
 
 -   Schemas will be the minimum decomposable unit.
 -   Physical shards must be routed along with schemas.
@@ -781,12 +720,15 @@ database = get_physical_shard_from_tenant(tenant)
 class ShardedSchemasDatabaseRouter:
 
     def db_for_read(model, ...):
+        # Physical shard as default value
         ...
 
     def db_for_write(model, ...):
+        # Physical shard as default value
         ...
 
     def allow_migrate(self, db, app_label, model_name, ...):
+        # Same implementation of the selected package
         ...
 ```
 
@@ -796,7 +738,7 @@ class ShardedSchemasDatabaseRouter:
 
 ---
 
-##### What to do with shared apps?
+##### What to do with .emph[shared] apps?
 
 .warning[⚠️ No cross-database relations allowed]
 
@@ -815,19 +757,22 @@ class ShardedSchemasDatabaseRouter:
 
 ---
 
+layout: false
+class: middle center
+
+### .red[What if, after all, schemas were not enough?]
+
+--
+
+![Meme of three characters of Star Trek in facepalm position](images/triple-facepalm.png)
+
+---
+
 layout: true
 
 ## The moment of .red[chaos]
 
 ---
-
---
-
-.red[What if, after all, schemas were not enough?]
-
---
-
-.center[![Meme of three characters of Star Trek in facepalm position](images/triple-facepalm.png)]
 
 ---
 
@@ -839,30 +784,67 @@ layout: true
 
 > Sensible people will see trouble coming and avoid it,
 > but an unthinking person will walk right into it and regret it later.
-> .right[Proverbs 22:3 GNT]
+> (Proverbs 22:3 GNT)
 
 ---
 
-layout: true
+layout: false
+class: middle center
+
+![Meme of the hard choice with schemas](images/to-schema-or-not-to-schema.png)
+
+---
+
+layout: false
 class: middle
 
 # In conclusion
 
 ---
 
+## Is multi-tenancy through schemas de-facto wrong?
+
+<br/>
+
+--
+
+# .green[No]
+
 ---
 
-1. Is multi-tenancy through schemas de-facto wrong?
-2. Should you use schemas in your next SaaS project?
-3. Should you change your database architecture now?
+## Should you use schemas in your next SaaS project?
+
+<br/>
+
+--
+
+# .green[Run the numbers]
+
+---
+
+## Should you change your database architecture right away?
+
+<br/>
+
+--
+
+# .green[It depends]
+
+--
+
+### .green[Run the numbers - don't panic]
+
+--
+
+### .green[There are ways to smartly transition]
 
 ---
 
 layout: false
 
-## Alternative packages
+## Just in case
 
-##### Shared database
+##### Alternative packages for shared database:
 
 -   [citusdata/django-multitenant](https://github.com/citusdata/django-multitenant)
 -   [raphaelm/django-scopes](https://github.com/raphaelm/django-scopes)
@@ -873,7 +855,7 @@ layout: false
 
 ## And that's it!
 
-##### We can keep in touch here:
+##### Want do discuss more?
 
 |         |                                                    |
 | ------- | -------------------------------------------------- |
@@ -881,9 +863,7 @@ layout: false
 | GitHub  | [github.com/lorinkoz](https://github.com/lorinkoz) |
 | Email   | [lorinkoz@gmail.com](mailto:lorinkoz@gmail.com)    |
 
-##### Special thanks to:
-
-Katie McLaughlin
+.right[![Figurines used to represent users with sunglasses](images/figurines.png)]
 
 ---
 
