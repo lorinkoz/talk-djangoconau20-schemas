@@ -368,7 +368,7 @@ INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 .right-column[
 
 -   Django migrations
--   Content-types.ref[1]
+-   Content types.ref[1]
 -   Other meta models
     ]
 
@@ -454,17 +454,9 @@ We are using the `allow_migrate` of a database router.
 -   Change "app to schema" configuration.
 -   Apply migrations of the app again.
 
----
-
-##### .red[What if there is data?]
-
--   Hard to fix with migrations.
--   Search path hides the tables.
--   Recommended with some form of export / import.
-
 --
 
-.box[💡 Avoid whenever possible]
+.box[🦉 Avoid having data before you have stable layout]
 
 ---
 
@@ -566,26 +558,19 @@ layout: true
 
 layout: true
 
-## Cross-tenant aggregations
+## Other challenges
 
 ---
 
-.center[![Analog dashboard](images/dashboard.jpg)]
-
 ---
 
-##### Strategy:
-
--   Iterate through tenants.
--   Background job with cached results.
-
---
-
-##### .red[Careful with IDs!]
+-   Data recollection across tenants.
+-   Backup / restore flow of tenants with free users.
+-   What to do with unique, general purpose tenants like a master site, a blog or the help center.
 
 --
 
-.box[💡 Use global identifiers in addition to local IDs]
+.center[![SpaceX rocket](images/rocket.png)]
 
 ---
 
@@ -687,17 +672,6 @@ layout: true
 
 --
 
-##### Sharding:
-
-Horizontal partitioning of data.
-
--   Physical shards
--   Logical shards
-
-Logical shards are mapped to physical shards.
-
----
-
 .box[🤓 Let's try it in the Django side]
 
 --
@@ -740,7 +714,9 @@ class ShardedSchemasDatabaseRouter:
 
 ---
 
-##### What to do with .emph[shared] apps?
+##### .red[What to do with .emph[shared] apps?]
+
+--
 
 .warning[⚠️ No cross-database relations allowed]
 
@@ -837,6 +813,14 @@ class: middle
 
 ---
 
+class: middle center
+
+# 🦉
+
+## .blue[Make your informed decision with a cold head]
+
+---
+
 layout: false
 
 ## Just in case
@@ -860,7 +844,7 @@ layout: false
 | GitHub  | [github.com/lorinkoz](https://github.com/lorinkoz) |
 | Email   | [lorinkoz@gmail.com](mailto:lorinkoz@gmail.com)    |
 
-.right[![Figurines used to represent users with sunglasses](images/figurines.png)]
+.center[![Figurines used to represent users with sunglasses](images/figurines.png)]
 
 ---
 
