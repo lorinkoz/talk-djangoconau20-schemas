@@ -67,7 +67,6 @@ So, if you’ve ever woken up with a multi-million-dollar idea for a multi-tenan
 
 -   Proud citizen of Holguín, Cuba.
 -   Django developer for 11 years.
--   Open source contributor.
 -   Chaser of multi-tenancy beasts.
 
 ]
@@ -248,12 +247,12 @@ layout: true
 
 .box[Custom database router with `allow_migrate`]
 
-.right[▫️]
-
 ---
 
 layout: false
 class: middle
+
+--
 
 # Why schemas?
 
@@ -271,7 +270,7 @@ class: middle
 layout: false
 class: middle center
 
-![Image of rocks in perfect balance](images/rock-balance-on-shore.jpg)
+![Image of thorns in rose](images/rose-thorns.png)
 
 ---
 
@@ -456,7 +455,7 @@ We are using the `allow_migrate` of a database router.
 
 --
 
-.box[🦉 Avoid having data before you have stable layout]
+.box[🦉 Avoid having data before you have a stable layout]
 
 ---
 
@@ -510,16 +509,11 @@ layout: true
 
 --
 
-.right-column-33[
+.right-column-33[There are strategies to reduce the time...<br/><br/>]
 
-##### Possible strategies:
+--
 
--   Sequential
--   In parallel
--   By time-zone
--   Just-in-time
-
-]
+.right-column-33[.warning[Migrations will still be slow!]]
 
 ---
 
@@ -558,7 +552,7 @@ layout: true
 
 layout: true
 
-## Other challenges
+## Other middle-term challenges
 
 ---
 
@@ -584,7 +578,7 @@ class: middle center
 layout: false
 class: middle
 
-# Beware of the behemoth
+# The size of the behemoth
 
 ---
 
@@ -596,7 +590,7 @@ layout: true
 
 --
 
-There is no .strike[practical] theoretical limit on the number of tables in a given database..ref[1]
+There is no practical limit on the number of tables in a given database..ref[1]
 
 .bottom[
 .footnote[.ref[1] https://www.postgresql.org/message-id/53386E0C47E7D41194BB0002B325C997747F2B@NTEX60]
@@ -604,48 +598,31 @@ There is no .strike[practical] theoretical limit on the number of tables in a gi
 
 --
 
-.red[In theory, theory is enough, but practice shows otherwise.]
-
---
-
 .warning[⚠️ There is a practical limit!]
 
 ---
 
-##### Million tables factor
+.emph[A million] is a scary number of tables to have in a single database.
 
 --
 
-.center[![Formula of the million tables factor](images/formula-million-tables-factor.png)]
+.left-column-66[![Formula of the scary number of tenants](images/formula-scary-number-of-tenants.png)]
 
-.box[🐍 `tables_per_tenant \* number_of_tenants / 10\*\*6`]
+--
 
----
+.right-column-33[
 
-.right[
+.center[
 
-|            | 50   | 100  | 500  | 1k   | 5k          | 10k        | 50k         | 100k        |
-| ---------- | ---- | ---- | ---- | ---- | ----------- | ---------- | ----------- | ----------- |
-| .bold[50]  | 0.00 | 0.01 | 0.03 | 0.05 | 0.25        | 0.50       | .red[2.50]  | .red[5.00]  |
-| .bold[100] | 0.01 | 0.01 | 0.05 | 0.10 | 0.50        | .red[1.00] | .red[5.00]  | .red[10.00] |
-| .bold[150] | 0.01 | 0.02 | 0.08 | 0.15 | .emph[0.75] | .red[1.50] | .red[7.50]  | .red[15.00] |
-| .bold[200] | 0.01 | 0.02 | 0.10 | 0.20 | .red[1.00]  | .red[2.00] | .red[10.00] | .red[20.00] |
-| .bold[250] | 0.01 | 0.03 | 0.13 | 0.25 | .red[1.25]  | .red[2.50] | .red[12.50] | .red[25.00] |
-| .bold[300] | 0.02 | 0.03 | 0.15 | 0.30 | .red[1.50]  | .red[3.00] | .red[15.00] | .red[30.00] |
+| T   | S    |
+| --- | ---- |
+| 50  | 20k  |
+| 100 | 10k  |
+| 150 | 6.7k |
+| 200 | 5k   |
 
 ]
-
-.bottom[
-.footnote[Columns are number of tenants, rows are number of tables, intersection shows the million tables factor for the given row and column.]
 ]
-
----
-
-##### Scary number of tenants
-
-.center[![Formula of the scary number of tenants](images/formula-scary-number-of-tenants.png)]
-
-.box[🐍 `10\*\*6 / tables_per_tenant`]
 
 ---
 
@@ -657,13 +634,6 @@ There is no .strike[practical] theoretical limit on the number of tables in a gi
 
 ---
 
-layout: false
-class: middle center
-
-![Joke with vessels falling off the end of the sea](images/uncharted-territories.png)
-
----
-
 layout: true
 
 ## What if we shard?
@@ -671,6 +641,10 @@ layout: true
 ---
 
 --
+
+.center[![Joke with vessels falling off the end of the sea](images/uncharted-territories.png)]
+
+---
 
 .box[🤓 Let's try it in the Django side]
 
@@ -714,15 +688,11 @@ class ShardedSchemasDatabaseRouter:
 
 ---
 
-##### .red[What to do with .emph[shared] apps?]
+.warning[⚠️ There are now multiple shared schemas]
 
 --
 
-.warning[⚠️ No cross-database relations allowed]
-
---
-
-.warning[⚠️ Extra care with free users]
+.warning[⚠️ For free users, there are now multiple catalogs]
 
 ---
 
@@ -775,13 +745,13 @@ class: middle
 
 ---
 
-## Is multi-tenancy through schemas de-facto wrong as a choice?
+## Is multi-tenancy through schemas de facto wrong as a choice?
 
 <br/>
 
 --
 
-# .green[No]
+# .green[Absolutely not]
 
 ---
 
@@ -791,7 +761,7 @@ class: middle
 
 --
 
-# .green[Why schemas over shared?]
+# .green[Why schemas?]
 
 --
 
@@ -817,7 +787,7 @@ class: middle center
 
 # 🦉
 
-## .blue[Make your informed decision with a cold head]
+## .blue[Make your informed decision .emph[with a cold head]]
 
 ---
 
