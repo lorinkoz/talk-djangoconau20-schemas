@@ -1,6 +1,4 @@
-class: middle center
-
-### Yes, this is the first slide
+<!-- nothing -->
 
 ---
 
@@ -8,19 +6,11 @@ class: middle center
 
 ![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro1.png)
 
-???
-
-“What’s wrong with my multi-tenancy approach”, was the question in this Reddit post I found some weeks ago...
-
 ---
 
 class: middle center
 
 ![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro2.png)
-
-???
-
-...from a person that was intending to create a multi-million-dollar app in Django by means of adding multi-tenancy to a previously existing single-tenant project.
 
 ---
 
@@ -28,19 +18,11 @@ class: middle center
 
 ![Meme of clapping the hand of someone who's drowning regarding an online question](images/hand-clap-drowning-meme.png)
 
-???
-
-I felt quite identified with the redditer, since I myself had the same question a couple of years ago. And, despite the fact that I took a different approach than this person, it’s true that there’s more than this mate and me out in the ocean wondering what is wrong with the path they have taken, or are about take, when it comes to multi-tenancy in Django.
-
 ---
 
 class: middle center
 
 ![Reddit post about multi-million dollar app idea for a SaaS in Django](images/intro3.png)
-
-???
-
-But anyways, I now feel in a much better position to answer this mate and myself of what was wrong then and what could still be wrong today.
 
 ---
 
@@ -52,10 +34,6 @@ class: middle
 <hr/>
 
 ![Logo of PyConline AU](images/pyconlineau.png)
-
-???
-
-So, if you’ve ever woken up with a multi-million-dollar idea for a multi-tenancy project in Django, and you’ve made the decision to do so through PostgreSQL schemas, this talk is definitely for you.
 
 ---
 
@@ -590,7 +568,7 @@ layout: true
 
 --
 
-There is no practical limit on the number of tables in a given database..ref[1]
+There is no practical limit on the number of tables a PostgreSQL database can have..ref[1]
 
 .bottom[
 .footnote[.ref[1] https://www.postgresql.org/message-id/53386E0C47E7D41194BB0002B325C997747F2B@NTEX60]
@@ -598,7 +576,7 @@ There is no practical limit on the number of tables in a given database..ref[1]
 
 --
 
-.warning[⚠️ There is a practical limit!]
+.warning[⚠️ But there is a practical limit!]
 
 ---
 
@@ -636,7 +614,7 @@ There is no practical limit on the number of tables in a given database..ref[1]
 
 layout: true
 
-## What if we shard?
+## Why don't we shard?
 
 ---
 
@@ -652,15 +630,15 @@ layout: true
 
 ##### Strategy:
 
--   Schemas will be the minimum decomposable unit.
+-   Schemas must be the minimum decomposable unit.
 -   Physical shards must be routed along with schemas.
 
 --
 
 ```python
-tenant = Tenant(schema_name="schema_1", logical_shard=1)
+tenant = Tenant(schema_name="schema_1", `logical_shard=1`)
 
-database = get_physical_shard_from_tenant(tenant)
+database = `get_physical_shard_from_tenant`(tenant)
 
 ```
 
@@ -669,11 +647,11 @@ database = get_physical_shard_from_tenant(tenant)
 ```python
 class ShardedSchemasDatabaseRouter:
 
-    def db_for_read(model, ...):
+    def `db_for_read`(model, ...):
         # Physical shard as default value
         ...
 
-    def db_for_write(model, ...):
+    def `db_for_write`(model, ...):
         # Physical shard as default value
         ...
 
@@ -692,7 +670,7 @@ class ShardedSchemasDatabaseRouter:
 
 --
 
-.warning[⚠️ For free users, there are now multiple catalogs]
+.warning[⚠️ For free users, what to do?]
 
 ---
 
@@ -703,7 +681,7 @@ class ShardedSchemasDatabaseRouter:
 layout: false
 class: middle center
 
-### .red[What if, after all, schemas were not enough?]
+### .red[What if, after all, schemas are not enough?]
 
 --
 
