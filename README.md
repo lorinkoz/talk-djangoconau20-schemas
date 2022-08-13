@@ -2,6 +2,3 @@
 
 **Talk description**:
 https://2020.pycon.org.au/program/crsjxf/
-
-**Talk slides**:
-https://lorinkoz.github.io/djcau2020-schemas/
